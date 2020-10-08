@@ -1,4 +1,4 @@
-use phasmo_rs::{Evidence, Ghost, VariantIter};
+use phasmo_rs::phasmo::{Evidence, Ghost, VariantIter};
 use std::collections::HashSet;
 
 fn main() {
@@ -35,11 +35,13 @@ fn main() {
     let requires = vec![Evidence::EmfLevel5];
     let forbids = vec![Evidence::Fingerprints];
     //
-    let ghosts = Ghost::filter_by_required_evidences(all_ghosts.iter().cloned(), requires.iter());
-    let ghosts = Ghost::filter_by_forbid_evidences(ghosts, forbids.iter());
-    ghosts.for_each(|ghost| {
+    let ghosts = Ghost::filter_by_required_evidences(all_ghosts.iter().cloned(), requires.as_ref());
+    let ghosts = Ghost::filter_by_forbid_evidences(ghosts.into_iter(), forbids.as_ref());
+    ghosts.iter().for_each(|ghost| {
         print!("{}", ghost);
     });
+
+    phasmo_rs::run()
 }
 
 /// Prints:

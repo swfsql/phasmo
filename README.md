@@ -1,4 +1,4 @@
-# emoji-powered Phasmophobia evidence tracker
+# emoji-first Phasmophobia evidence tracker
 
 WIP utility to help tracking evidences for the Phasmophobia game.  
 

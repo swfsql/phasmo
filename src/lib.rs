@@ -1,622 +1,80 @@
 #![feature(or_patterns)]
 
-use std::collections::HashSet;
+pub mod app;
+pub mod phasmo;
 
-pub trait VariantIter: Sized {
-    fn iter_variants() -> Vec<Self>;
+use self::app::AppData;
+use druid::{AppLauncher, LocalizedString, WindowDesc};
+use wasm_bindgen::prelude::wasm_bindgen;
+
+#[wasm_bindgen]
+pub fn wasm_main() {
+    // This hook is necessary to get panic messages in the console
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+    run()
 }
 
-pub trait FilterBy<T> {
-    fn is_related(self, t: T) -> bool;
-}
+pub fn run() {
+    let main_window = WindowDesc::new(app::ui_builder).title(
+        LocalizedString::new("app-window-title").with_placeholder("Phasmo Evidence Tracker"),
+    );
+    // Set our initial data
+    let data = AppData::default();
+    AppLauncher::with_window(main_window)
+        .configure_env(|env: &mut _, _t: &AppData| {
+            use druid::{theme, Color, Key};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum Evidence {
-    /// 📡
-    EmfLevel5,
-    /// 👣
-    Fingerprints,
-    /// 🥶
-    FreezingTemperature,
-    /// ✨
-    GhostOrb,
-    /// 📖
-    GhostWriting,
-    /// 📻
-    SpiritBox,
-}
+            let base03 = Color::from_rgba32_u32(0x002b36ff);
+            let base02 = Color::from_rgba32_u32(0x073642ff);
+            let base01 = Color::from_rgba32_u32(0x586e75ff);
+            let base00 = Color::from_rgba32_u32(0x657b83ff);
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum Feature {
-    Caution(CautionFeature),
-    Useful(UsefulFeature),
-}
+            let base0 = Color::from_rgba32_u32(0x839496ff);
+            let base1 = Color::from_rgba32_u32(0x93a1a1ff);
+            let base2 = Color::from_rgba32_u32(0xeee8d5ff);
+            let base3 = Color::from_rgba32_u32(0xfdf6e3ff);
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum CautionFeature {
-    /// 🎯
-    SingleTarget,
-    /// ️️⚔️
-    Hostile,
-    /// ⏩
-    Fast,
-    /// 🐌
-    Slow,
-    /// 🪁
-    Flies,
-    /// 🧱
-    MoveThroughWalls,
-    /// 😨
-    SanityDrain,
-}
+            let yellow = Color::from_rgba32_u32(0xb58900ff);
+            let orange = Color::from_rgba32_u32(0xcb4b16ff);
+            let red = Color::from_rgba32_u32(0xdc322fff);
+            let magenta = Color::from_rgba32_u32(0xd33682ff);
+            let violet = Color::from_rgba32_u32(0x6c71c4ff);
+            let blue = Color::from_rgba32_u32(0x268bd2ff);
+            let cyan = Color::from_rgba32_u32(0x2aa198ff);
+            let green = Color::from_rgba32_u32(0x859900ff);
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum UsefulFeature {
-    /// ️✝️
-    Crucifix,
-    /// 🔌
-    PowerSource,
-    /// 🕯️
-    Light,
-    /// 🙈
-    Hiding,
-    /// 📸
-    Picture,
-    /// 🧹
-    CleanRoom,
-    /// 👪
-    Grouped,
-    /// 🚬
-    SmudgeSticks,
-    /// 🧂
-    Salt,
-}
+            // for e in env.get_all() {
+            //     dbg!(e);
+            // }
+            env.set(theme::LABEL_COLOR, base02.clone());
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-pub enum Ghost {
-    /// 🌬️
-    ///
-    /// 🕵️ 📡👣🥶
-    ///
-    /// 💪 🎯 1 person is targeted at a time
-    /// 💪 🎯 can start the hunt anytime
-    ///
-    /// 😩 ✝️ is feared (and it's less agressive nearby one)
-    Banshee,
+            env.set(theme::PRIMARY_LIGHT, blue.clone());
+            env.set(theme::PRIMARY_DARK, yellow.clone());
 
-    /// 👿
-    ///
-    /// 🕵️ 🥶📖📻
-    ///
-    /// 💪 ⚔️ very hostile, attacks often
-    ///
-    /// 😩 (🎲  Ouija doesn't lower sanity)
-    /// 📝 ✝️ is recommended to lower hunts
-    Demon,
+            env.set(theme::FOREGROUND_LIGHT, red.clone());
+            env.set(theme::FOREGROUND_DARK, green.clone());
 
-    /// 🧞
-    ///
-    /// 🕵️ 📡✨📻
-    ///
-    /// 💪 ⏩ moves fast if victim is far away
-    /// 📝 ⚔️ and it's terriorial - attacks when threatened
-    ///
-    /// 😩 🔌 when off, Jinn cannot use it's "ability"
-    /// 📝 (🔌 counts only as the general power source)
-    Jinn,
+            env.set(theme::BACKGROUND_LIGHT, red.clone());
+            env.set(theme::BACKGROUND_DARK, green.clone());
 
-    /// 🖤👻
-    ///
-    /// 🕵️ 🥶✨📻
-    ///
-    /// 💪 🕶️ attacks more in the dark
-    /// 📝 🔌 often turns lights / power source off
-    ///
-    /// 😩 🕯️ attacks less in the light
-    Mare,
+            env.set(theme::SELECTION_COLOR, red.clone());
 
-    /// 👹
-    ///
-    /// 🕵️ 📡📖📻
-    ///
-    /// 💪 🏃 active when nearby it's prey
-    /// 📝 also moves objects fast
-    ///
-    /// 😩 (none)
-    /// 📝 it's very active, and may show himself early
-    /// 📝 likes to wander close to it's room
-    /// 📝 🙈 hiding in closet may be effective
-    Oni,
+            env.set(theme::BUTTON_LIGHT, base1.clone());
+            env.set(theme::BUTTON_DARK, base1.clone());
 
-    /// 🥛👻
-    ///
-    /// 🕵️ 📡🥶✨
-    ///
-    /// 💪 👀 looking at him drops your sanity
-    /// 💪 🧱 can go interact with anyone, even move through walls
-    /// 📝 (ie. random people at random places may detect Emf)
-    ///
-    /// 😩 📸 dissapears if it's Shadow Form picture's taken
-    /// 📝 (📸 when hunting, camera's flash won't stop it)
-    /// 📝 🐌 it's not so fast
-    Phantom,
+            env.set(theme::WINDOW_BACKGROUND_COLOR, base1.clone());
 
-    /// 👻 (ﾉ◕ヮ◕)ﾉ︵ ┻━┻
-    ///
-    /// 🕵️ 👣✨📻
-    ///
-    /// 💪 (🤹 can throw/levitate many objects at once)
-    /// 📝 noise from many moved objects can be a consequence
-    ///
-    /// 😩 (🧹 becomes almost innefective in an empty room)
-    Poltergeist,
+            env.set(theme::TEXT_SIZE_NORMAL, 22.0f64);
+            env.set(theme::TEXT_SIZE_LARGE, 30.0f64);
 
-    /// 🧟👻
-    ///
-    /// 🕵️ 📡👣📖
-    ///
-    /// 💪 ⏩ fastests ghost when hunting
-    /// 💪 ⚔️ attacks regardless of sanity during hunt
-    ///
-    /// 😩 🐌 slow otherwise, or when people are hiding
-    Revenant,
+            // env.set("text_size_normal",base);
+            // Float 19,
+            // env.set("text_size_large",base);
+            // Float 28,
 
-    /// 😳👻
-    ///
-    /// 🕵️ 📡✨📖
-    ///
-    /// 💪 (⚔️ hunts more often on low sanity)
-    /// 📝 prefers to target loners
-    /// 📝 "being alone" means "being alone in a room"
-    ///
-    /// 😩 👪 won't hunt grouped people
-    /// 📝 will hardly interact with grouped people
-    Shade,
-
-    /// 👻
-    ///
-    /// 🕵️ 🥶✨📖
-    ///
-    /// 💪 (none)
-    ///
-    /// 😩 🚬 Smudge Sticks stop it's attacks for a long time
-    Spirit,
-
-    /// 💀👻
-    ///
-    /// 🕵️ 👣🥶📻
-    ///
-    /// 💪 🪁 can fly
-    /// 💪 🪁 leaves no footsteps
-    /// 📝 🧂 except it leaves a step mark on salt
-    /// 💪 🧱 may move through walls
-    /// 💪 🪑 may change the Ghost Room more frequently
-    ///
-    /// 😩 🧂 stops attacking when in contact with salt
-    /// 📝 🧂 but it becomes more agitated
-    Wraith,
-
-    /// 🎎👻
-    ///
-    /// 🕵️ 🥶✨📖
-    ///
-    /// 💪 😨 fastest sanity drainer
-    ///
-    /// 😩 🚬 Smudge Sticks on it's room prevents it from wandering
-    /// from it for a long time
-    Yurei,
-}
-
-impl std::fmt::Display for Ghost {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use Ghost::*;
-        let emoji = match *self {
-            Banshee => "🌬️",
-            Demon => "👿",
-            Jinn => "🧞",
-            Mare => "🖤",
-            Oni => "👹",
-            Phantom => "🥛",
-            Poltergeist => "🤹",
-            Revenant => "🧟",
-            Shade => "😳",
-            Spirit => "👻",
-            Wraith => "💀",
-            Yurei => "🎎",
-        };
-        write!(f, "{}", emoji)
-    }
-}
-
-impl std::fmt::Display for Evidence {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use Evidence::*;
-        let emoji = match self {
-            EmfLevel5 => '📡',
-            Fingerprints => '👣',
-            FreezingTemperature => '🥶',
-            GhostOrb => '✨',
-            GhostWriting => '📖',
-            SpiritBox => '📻',
-        };
-        write!(f, "{}", emoji)
-    }
-}
-
-impl std::fmt::Display for Feature {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use Feature::*;
-        let emoji = match self {
-            Caution(c) => c.to_string(),
-            Useful(u) => u.to_string(),
-        };
-        write!(f, "{}", emoji)
-    }
-}
-
-impl std::fmt::Display for CautionFeature {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use CautionFeature::*;
-        let emoji = match self {
-            SingleTarget => "🎯",
-            Hostile => "⚔️",
-            Fast => "⏩",
-            Slow => "🐌",
-            Flies => "🪁",
-            MoveThroughWalls => "🧱",
-            SanityDrain => "😨",
-        };
-        write!(f, "{}", emoji)
-    }
-}
-
-impl std::fmt::Display for UsefulFeature {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        use UsefulFeature::*;
-        let emoji = match self {
-            Crucifix => "✝️",
-            PowerSource => "🔌",
-            Light => "🕯️",
-            Hiding => "🙈",
-            Picture => "📸",
-            CleanRoom => "🧹",
-            Grouped => "👪",
-            SmudgeSticks => "🚬",
-            Salt => "🧂",
-        };
-        write!(f, "{}", emoji)
-    }
-}
-
-impl VariantIter for Evidence {
-    fn iter_variants() -> Vec<Self> {
-        use Evidence::*;
-        vec![
-            EmfLevel5,
-            Fingerprints,
-            FreezingTemperature,
-            GhostOrb,
-            GhostWriting,
-            SpiritBox,
-        ]
-    }
-}
-
-impl VariantIter for Ghost {
-    fn iter_variants() -> Vec<Self> {
-        use Ghost::*;
-        vec![
-            Banshee,
-            Demon,
-            Jinn,
-            Mare,
-            Oni,
-            Phantom,
-            Poltergeist,
-            Revenant,
-            Shade,
-            Spirit,
-            Wraith,
-            Yurei,
-        ]
-    }
-}
-
-impl VariantIter for Feature {
-    fn iter_variants() -> Vec<Self> {
-        use Feature::*;
-        let caution = CautionFeature::iter_variants().into_iter().map(Caution);
-        let useful = UsefulFeature::iter_variants().into_iter().map(Useful);
-        caution.chain(useful).collect()
-    }
-}
-
-impl VariantIter for CautionFeature {
-    fn iter_variants() -> Vec<Self> {
-        use CautionFeature::*;
-        vec![
-            Hostile,
-            Flies,
-            MoveThroughWalls,
-            Fast,
-            SingleTarget,
-            SanityDrain,
-            Slow,
-        ]
-    }
-}
-
-impl VariantIter for UsefulFeature {
-    fn iter_variants() -> Vec<Self> {
-        use UsefulFeature::*;
-        vec![
-            Crucifix,
-            Light,
-            PowerSource,
-            Grouped,
-            Salt,
-            SmudgeSticks,
-            Picture,
-            CleanRoom,
-            Hiding,
-        ]
-    }
-}
-
-impl Evidence {
-    // ✔️
-    pub fn required_filter(
-        self,
-        ghosts: impl Iterator<Item = Ghost>,
-    ) -> impl Iterator<Item = Ghost> {
-        ghosts.filter(move |g| g.is_related(self))
-    }
-
-    // ❌
-    pub fn forbidden_filter(
-        self,
-        ghosts: impl Iterator<Item = Ghost>,
-    ) -> impl Iterator<Item = Ghost> {
-        ghosts.filter(move |g| !g.is_related(self))
-    }
-}
-
-impl FilterBy<Evidence> for Ghost {
-    fn is_related(self, evidence: Evidence) -> bool {
-        use Evidence::*;
-        use Ghost::*;
-        match (self, evidence) {
-            (Banshee, EmfLevel5 | Fingerprints | FreezingTemperature) => true,
-            (Demon, FreezingTemperature | GhostWriting | SpiritBox) => true,
-            (Jinn, SpiritBox | GhostOrb | EmfLevel5) => true,
-            (Mare, SpiritBox | GhostOrb | FreezingTemperature) => true,
-            (Oni, EmfLevel5 | SpiritBox | GhostWriting) => true,
-            (Phantom, EmfLevel5 | GhostOrb | FreezingTemperature) => true,
-            (Poltergeist, SpiritBox | Fingerprints | GhostOrb) => true,
-            (Revenant, EmfLevel5 | Fingerprints | GhostWriting) => true,
-            (Shade, EmfLevel5 | GhostOrb | GhostWriting) => true,
-            (Spirit, GhostOrb | GhostWriting | FreezingTemperature) => true,
-            (Wraith, Fingerprints | SpiritBox | FreezingTemperature) => true,
-            (Yurei, GhostOrb | GhostWriting | FreezingTemperature) => true,
-            _ => false,
-        }
-    }
-}
-
-impl FilterBy<Feature> for Ghost {
-    fn is_related(self, feat: Feature) -> bool {
-        use CautionFeature::*;
-        use Feature::*;
-        use Ghost::*;
-        use UsefulFeature::*;
-        match (self, feat) {
-            (Banshee, Caution(SingleTarget) | Useful(Crucifix)) => true,
-            (Demon, Caution(Hostile) | Useful(Crucifix)) => true,
-            (Jinn, Caution(Hostile) | Caution(Fast) | Useful(PowerSource)) => true,
-            (Mare, Useful(Light)) => true,
-            (Oni, Useful(Hiding)) => true,
-            (Phantom, Caution(Slow) | Useful(Picture)) => true,
-            (Poltergeist, Useful(CleanRoom)) => true,
-            (Revenant, Caution(Hostile) | Caution(Fast) | Caution(Slow)) => true,
-            (Shade, Useful(Grouped)) => true,
-            (Spirit, Useful(SmudgeSticks)) => true,
-            (Wraith, Caution(Flies) | Caution(MoveThroughWalls) | Useful(Salt)) => true,
-            (Yurei, Caution(SanityDrain) | Useful(SmudgeSticks)) => true,
-            _ => false,
-        }
-    }
-}
-
-impl Ghost {
-    pub fn description(&self) -> &'static str {
-        use Ghost::*;
-        match *self {
-            Banshee => {
-                "
-                💪 🎯 1 person is targeted at a time
-                💪 🎯 can start the hunt anytime
-                
-                😩 ✝️ is feared (and it's less agressive nearby one)
-                "
-            }
-
-            Demon => {
-                "
-                💪 ⚔️ very hostile, attacks often
-                
-                😩 (🎲  Ouija doesn't lower sanity)
-                📝 ✝️ is recommended to lower hunts
-                "
-            }
-
-            Jinn => {
-                "
-                💪 ⏩ moves fast if victim is far away
-                📝 ⚔️ and it's terriorial - attacks when threatened
-                
-                😩 🔌 when off, Jinn cannot use it's 'ability'
-                📝 (🔌 counts only as the general power source)
-                "
-            }
-
-            Mare => {
-                "
-                💪 🕶️ attacks more in the dark
-                📝 🔌 often turns lights / power source off
-                
-                😩 🕯️ attacks less in the light
-                "
-            }
-
-            Oni => {
-                "
-                💪 🏃 active when nearby it's prey
-                📝 also moves objects fast
-                
-                😩 (none)
-                📝 it's very active, and may show himself early
-                📝 likes to wander close to it's room
-                📝 🙈 hiding in closet may be effective
-                "
-            }
-
-            Phantom => {
-                "
-                💪 👀 looking at him drops your sanity
-                💪 🧱 can go interact with anyone, even move through walls
-                📝 (ie. random people at random places may detect Emf)
-                
-                😩 📸 dissapears if it's Shadow Form picture's taken
-                📝 (📸 when hunting, camera's flash won't stop it)
-                📝 🐌 it's not so fast
-                "
-            }
-
-            Poltergeist => {
-                "
-                💪 (🤹 can throw/levitate many objects at once)
-                📝 noise from many moved objects can be a consequence
-                
-                😩 (🧹 becomes almost innefective in an empty room)
-                "
-            }
-
-            Revenant => {
-                "
-                💪 ⏩ fastests ghost when hunting
-                💪 ⚔️ attacks regardless of sanity during hunt
-                
-                😩 🐌 slow otherwise, or when people are hiding
-                "
-            }
-
-            Shade => {
-                "
-                💪 (⚔️ hunts more often on low sanity)
-                📝 prefers to target loners
-                📝 'being alone' means 'being alone in a room'
-                
-                😩 👪 won't hunt grouped people
-                📝 will hardly interact with grouped people
-                "
-            }
-
-            Spirit => {
-                "
-                💪 (none)
-                
-                😩 🚬 Smudge Sticks stop it's attacks for a long time
-                "
-            }
-
-            Wraith => {
-                "
-                💪 🪁 can fly
-                💪 🪁 leaves no footsteps
-                📝 🧂 except it leaves a step mark on salt
-                💪 🧱 may move through walls
-                💪 🪑 may change the Ghost Room more frequently
-                
-                😩 🧂 stops attacking when in contact with salt
-                📝 🧂 but it becomes more agitated
-                "
-            }
-
-            Yurei => {
-                "
-                💪 😨 fastest sanity drainer
-                
-                😩 🚬 Smudge Sticks on it's room prevents it from wandering from it for a long time
-                "
-            }
-        }
-    }
-    pub fn evidences(self) -> impl Iterator<Item = Evidence> {
-        Evidence::iter_variants()
-            .into_iter()
-            .filter(move |e| self.is_related(*e))
-    }
-    pub fn features(self) -> impl Iterator<Item = Feature> {
-        Feature::iter_variants()
-            .into_iter()
-            .filter(move |e| self.is_related(*e))
-    }
-    pub fn caution_features(self) -> impl Iterator<Item = CautionFeature> {
-        CautionFeature::iter_variants()
-            .into_iter()
-            .filter(move |e| self.is_related(Feature::Caution(*e)))
-    }
-    pub fn useful_features(self) -> impl Iterator<Item = UsefulFeature> {
-        UsefulFeature::iter_variants()
-            .into_iter()
-            .filter(move |e| self.is_related(Feature::Useful(*e)))
-    }
-
-    pub fn filter_by_required_evidences<'a>(
-        ghosts: impl Iterator<Item = Self>,
-        required_evidences: impl IntoIterator<Item = &'a Evidence> + Clone,
-    ) -> impl Iterator<Item = Self> {
-        ghosts.filter(move |g| {
-            required_evidences
-                .clone()
-                .into_iter()
-                .all(|re| g.is_related(*re))
+            // println!("{:?}", )
         })
-    }
-
-    pub fn filter_by_forbid_evidences<'a>(
-        ghosts: impl Iterator<Item = Self>,
-        forbid_evidences: impl IntoIterator<Item = &'a Evidence> + Clone,
-    ) -> impl Iterator<Item = Self> {
-        ghosts.filter(move |g| {
-            forbid_evidences
-                .clone()
-                .into_iter()
-                .all(|re| !g.is_related(*re))
-        })
-    }
-
-    pub fn filter_by_caution_features(
-        ghosts: impl Iterator<Item = Self>,
-    ) -> HashSet<CautionFeature> {
-        ghosts
-            .map(|g| g.caution_features())
-            .fold(HashSet::new(), |mut caution_acc, caution| {
-                caution.for_each(|c| {
-                    caution_acc.insert(c);
-                });
-                caution_acc
-            })
-    }
-
-    pub fn filter_by_useful_features(ghosts: impl Iterator<Item = Self>) -> HashSet<UsefulFeature> {
-        ghosts
-            .map(|g| g.useful_features())
-            .fold(HashSet::new(), |mut useful_acc, useful| {
-                useful.for_each(|u| {
-                    useful_acc.insert(u);
-                });
-                useful_acc
-            })
-    }
+        .use_simple_logger()
+        .launch(data)
+        .expect("launch failed")
 }
