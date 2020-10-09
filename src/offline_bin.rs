@@ -2,7 +2,12 @@ use phasmo_rs::phasmo::{Evidence, Ghost, VariantIter};
 use std::collections::HashSet;
 
 fn main() {
-    println!("Demonstration on how to use the functions:");
+    phasmo_rs::app::run()
+}
+
+/// Demonstration on how to use some functions.
+pub fn print_info() {
+    println!("Demonstration on how to use some functions:");
     println!();
 
     println!("Ghosts and evidences");
@@ -40,8 +45,6 @@ fn main() {
     ghosts.iter().for_each(|ghost| {
         print!("{}", ghost);
     });
-
-    phasmo_rs::run()
 }
 
 /// Prints:

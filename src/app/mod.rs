@@ -5,16 +5,20 @@ pub mod hlist;
 use crate::phasmo;
 use druid::{
     im::Vector,
-    widget::{Button, Either, Flex, Label, List, Scroll},
-    Data, Lens, UnitPoint, Widget, WidgetExt,
+    widget::{Button, Flex, Label},
+    Data, Lens, Widget, WidgetExt,
 };
 use hlist::Hlist;
 
 #[derive(Debug, Clone, PartialEq, Data, Lens)]
 pub struct AppData {
     evidences: Vector<EvidenceState>,
-    ghosts: Vector<GhostState>,
+    ghosts: Vector<Wghost>,
+    selected: Wghost,
 }
+
+#[derive(Debug, Clone, PartialEq, Data)]
+pub struct Wghost(#[data(same_fn = "PartialEq::eq")] pub phasmo::Ghost);
 
 #[derive(Debug, Clone, PartialEq, Data, Lens)]
 pub struct EvidenceState {
@@ -31,13 +35,6 @@ pub enum EvidenceStatus {
     Forbidden,
 }
 
-#[derive(Debug, Clone, PartialEq, Data, Lens)]
-pub struct GhostState {
-    is_possible: bool,
-    #[data(same_fn = "PartialEq::eq")]
-    kind: phasmo::Ghost,
-}
-
 impl Default for AppData {
     fn default() -> Self {
         use phasmo::VariantIter;
@@ -48,16 +45,16 @@ impl Default for AppData {
                 kind: e,
             })
             .collect();
-        let ghosts: Vec<_> = phasmo::Ghost::iter_variants()
+        let ghosts: Vector<_> = phasmo::Ghost::iter_variants()
             .into_iter()
-            .map(|g| GhostState {
-                is_possible: true,
-                kind: g,
-            })
+            .map(Wghost)
             .collect();
+        #[allow(clippy::deref_addrof)]
+        let selected = ghosts[0].clone();
         Self {
             evidences: evidences.into(),
-            ghosts: ghosts.into(),
+            ghosts,
+            selected,
         }
     }
 }
@@ -105,9 +102,10 @@ impl AppData {
             })
             .collect();
 
-        let ghosts = self.ghosts.clone().into_iter().map(|g| g.kind);
-
-        let ghosts = Ghost::filter_by_required_evidences(ghosts, required.as_ref());
+        let ghosts = Ghost::filter_by_required_evidences(
+            self.ghosts.iter().cloned().map(|g| g.0),
+            required.as_ref(),
+        );
         Ghost::filter_by_forbid_evidences(ghosts.into_iter(), forbid.as_ref())
     }
 }
@@ -121,41 +119,57 @@ pub fn ui_builder() -> impl Widget<AppData> {
 
     // summary
     {
-        // possible ghosts
-        {
-            let ghost_icons = Label::new(|data: &AppData, _env: &_| {
-                let ghosts = data.possible_ghosts();
+        // let ghost_icons = Flex::row()
+        let ghost_icon = || {
+            Button::new(|(g, _): &(Wghost, Option<Wghost>), _env: &_| g.0.to_string()).on_click(
+                |_ctx, (g, selected): &mut (Wghost, Option<Wghost>), _env| {
+                    *selected = Some(g.clone());
+                },
+            )
+        };
 
-                let ghosts_str: String = ghosts.iter().map(|g| g.to_string() + " ").collect();
+        use druid::LensExt;
+        let ghost_icons = Hlist::new(move || {
+            Flex::column().with_child(ghost_icon())
+            // .with_flex_spacer(1.0)
+            // .padding(10.0)
+            // .background(Color::rgb(0.5, 0.0, 0.5))
+            // .fix_height(50.0)
+        })
+        .lens(druid::lens::Id.map(
+            |d: &AppData| {
+                d.possible_ghosts()
+                    .into_iter()
+                    .map(Wghost)
+                    .map(|g| (g, None))
+                    .collect::<Vector<_>>()
+            },
+            |d: &mut AppData, x: Vector<(Wghost, Option<Wghost>)>| {
+                if let Some(selected) = x.iter().filter_map(|(_, selected)| selected.clone()).next()
+                {
+                    d.selected = selected;
+                };
+            },
+        ));
 
-                ghosts_str
-            });
+        let feature_icons = Label::new(|data: &AppData, _env: &_| {
+            use phasmo::Ghost;
+            let ghosts = data.possible_ghosts();
 
-            let feature_icons = Label::new(|data: &AppData, _env: &_| {
-                use phasmo::Ghost;
-                let ghosts = data.possible_ghosts();
+            let caution = Ghost::filter_by_caution_features(ghosts.iter().cloned());
 
-                let caution = Ghost::filter_by_caution_features(ghosts.iter().cloned());
+            let useful = Ghost::filter_by_useful_features(ghosts.iter().cloned());
 
-                // caution.iter().for_each(|c| print!("{}", c));
+            let caution_str: String = caution.iter().map(|c| c.to_string() + " ").collect();
+            let useful_str: String = useful.iter().map(|u| u.to_string() + " ").collect();
 
-                let useful = Ghost::filter_by_useful_features(ghosts.iter().cloned());
+            caution_str + "/" + &useful_str
+        });
 
-                // useful.iter().for_each(|u| print!("{}", u))
-
-                let caution_str: String = caution.iter().map(|c| c.to_string() + " ").collect();
-                let useful_str: String = useful.iter().map(|u| u.to_string() + " ").collect();
-
-                caution_str + "/" + &useful_str
-            });
-
-            // summary_ghosts_flex.add_flex_child(ghost_icons, 1.0);
-            summary_flex.add_flex_child(ghost_icons, 1.0);
-            summary_features_flex.add_flex_child(feature_icons, 1.0);
-            root.add_flex_child(summary_flex, 1.0);
-            root.add_flex_child(summary_features_flex, 1.0);
-            // root.add_child(ghost_icons);
-        }
+        summary_flex.add_flex_child(ghost_icons, 1.0);
+        summary_features_flex.add_flex_child(feature_icons, 1.0);
+        root.add_flex_child(summary_flex, 1.0);
+        root.add_flex_child(summary_features_flex, 1.0);
     };
 
     // evidences
@@ -213,13 +227,81 @@ pub fn ui_builder() -> impl Widget<AppData> {
             })
             .lens(AppData::evidences);
 
-        // let mut reset_flex = Flex::row();
-        // reset_flex.add_flex_child(reset_button, 1.0);
-        // root.add_flex_child(reset_flex, 1.0);
-
         reset_flex.add_flex_child(reset_button, 1.0);
         root.add_child(reset_flex);
     }
 
+    // general ghost info
+    {
+        let ghost_info =
+            Label::new(|g: &Wghost, _env: &_| format!("{} {:?}\n{}", g.0, g.0, g.0.description()))
+                .with_text_size(18.0)
+                .lens(AppData::selected);
+
+        let mut ghost_flex = Flex::row();
+        ghost_flex.add_flex_child(ghost_info, 1.0);
+
+        root.add_flex_child(ghost_flex, 1.0);
+    }
+
     root
+}
+
+pub fn run() {
+    use druid::{AppLauncher, LocalizedString, WindowDesc};
+
+    let main_window = WindowDesc::new(ui_builder)
+        .title(LocalizedString::new("app-window-title").with_placeholder("Phasmo Evidence Tracker"))
+        .window_size((610.0, 420.0));
+
+    // Set our initial data
+    let data = AppData::default();
+    AppLauncher::with_window(main_window)
+        // changes the default theme
+        .configure_env(|env: &mut _, _t: &AppData| {
+            use druid::{theme, Color};
+
+            // let base03 = &Color::from_rgba32_u32(0x002b36ff);
+            let base02 = &Color::from_rgba32_u32(0x073642ff);
+            // let base01 = &Color::from_rgba32_u32(0x586e75ff);
+            // let base00 = &Color::from_rgba32_u32(0x657b83ff);
+
+            // let base0 = &Color::from_rgba32_u32(0x839496ff);
+            let base1 = &Color::from_rgba32_u32(0x93a1a1ff);
+            // let base2 = &Color::from_rgba32_u32(0xeee8d5ff);
+            // let base3 = &Color::from_rgba32_u32(0xfdf6e3ff);
+
+            // let yellow = &Color::from_rgba32_u32(0xb58900ff);
+            // let orange = &Color::from_rgba32_u32(0xcb4b16ff);
+            let red = &Color::from_rgba32_u32(0xdc322fff);
+            // let magenta = &Color::from_rgba32_u32(0xd33682ff);
+            // let violet = &Color::from_rgba32_u32(0x6c71c4ff);
+            // let blue = &Color::from_rgba32_u32(0x268bd2ff);
+            // let cyan = &Color::from_rgba32_u32(0x2aa198ff);
+            // let green = &Color::from_rgba32_u32(0x859900ff);
+
+            env.set(theme::LABEL_COLOR, base02.clone());
+
+            // env.set(theme::PRIMARY_LIGHT, blue.clone());
+            // env.set(theme::PRIMARY_DARK, yellow.clone());
+
+            // env.set(theme::FOREGROUND_LIGHT, red.clone());
+            // env.set(theme::FOREGROUND_DARK, green.clone());
+
+            // env.set(theme::BACKGROUND_LIGHT, red.clone());
+            // env.set(theme::BACKGROUND_DARK, green.clone());
+
+            env.set(theme::SELECTION_COLOR, red.clone());
+
+            env.set(theme::BUTTON_LIGHT, base1.clone());
+            env.set(theme::BUTTON_DARK, base1.clone());
+
+            env.set(theme::WINDOW_BACKGROUND_COLOR, base1.clone());
+
+            env.set(theme::TEXT_SIZE_NORMAL, 22.0f64);
+            env.set(theme::TEXT_SIZE_LARGE, 30.0f64);
+        })
+        .use_simple_logger()
+        .launch(data)
+        .expect("launch failed")
 }

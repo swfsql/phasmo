@@ -209,8 +209,8 @@ pub enum Ghost {
     ///
     /// 💪 😨 fastest sanity drainer  
     ///
-    /// 😩 🚬 Smudge Sticks on it's room prevents it from wandering
-    /// from it for a long time  
+    /// 😩 🚬 Smudge Sticks can affect it's room  
+    /// 📝 prevents it from wandering for a long time  
     ///
     /// ---
     Yurei,
@@ -456,121 +456,122 @@ impl Ghost {
         use Ghost::*;
         match *self {
             Banshee => {
-                "
-                💪 🎯 1 person is targeted at a time
-                💪 🎯 can start the hunt anytime
-                
-                😩 ✝️ is feared (and it's less agressive nearby one)
+                "\
+                💪 🎯 1 person is targeted at a time\n\
+                💪 🎯 can start the hunt anytime\n\
+                \n\
+                😩 ✝️ is feared (and it's less agressive nearby one)\
                 "
             }
 
             Demon => {
-                "
-                💪 ⚔️ very hostile, attacks often
-                
-                😩 (🎲  Ouija doesn't lower sanity)
-                📝 ✝️ is recommended to lower hunts
+                "\
+                💪 ⚔️ very hostile, attacks often\n\
+                \n\
+                😩 (🎲  Ouija doesn't lower sanity)\n\
+                📝 ✝️ is recommended to lower hunts\n\
                 "
             }
 
             Jinn => {
-                "
-                💪 ⏩ moves fast if victim is far away
-                📝 ⚔️ and it's terriorial - attacks when threatened
-                
-                😩 🔌 when off, Jinn cannot use it's 'ability'
-                📝 (🔌 counts only as the general power source)
+                "\
+                💪 ⏩ moves fast if victim is far away\n\
+                📝 ⚔️ and it's terriorial - attacks when threatened\n\
+                \n\
+                😩 🔌 when off, Jinn cannot use it's 'ability'\n\
+                📝 (🔌 counts only as the general power source)\n\
                 "
             }
 
             Mare => {
-                "
-                💪 🕶️ attacks more in the dark
-                📝 🔌 often turns lights / power source off
-                
-                😩 🕯️ attacks less in the light
+                "\
+                💪 🕶️ attacks more in the dark\n\
+                📝 🔌 often turns lights / power source off\n\
+                \n\
+                😩 🕯️ attacks less in the light\n\
                 "
             }
 
             Oni => {
-                "
-                💪 🏃 active when nearby it's prey
-                📝 also moves objects fast
-                
-                😩 (none)
-                📝 it's very active, and may show himself early
-                📝 likes to wander close to it's room
-                📝 🙈 hiding in closet may be effective
+                "\
+                💪 🏃 active when nearby it's prey\n\
+                📝 also moves objects fast\n\
+                \n\
+                😩 (none)\n\
+                📝 it's very active, and may show himself early\n\
+                📝 likes to wander close to it's room\n\
+                📝 🙈 hiding in closet may be effective\n\
                 "
             }
 
             Phantom => {
-                "
-                💪 👀 looking at him drops your sanity
-                💪 🧱 can go interact with anyone, even behind walls
-                📝 (ie. random people at random places may detect Emf)
-                
-                😩 📸 dissapears if it's Shadow Form picture's taken
-                📝 (📸 when hunting, camera's flash won't stop it)
-                📝 🐌 it's not so fast
+                "\
+                💪 👀 looking at him drops your sanity\n\
+                💪 🧱 can go interact with anyone, even behind walls\n\
+                📝 (ie. random people at random places may detect Emf)\n\
+                \n\
+                😩 📸 dissapears if it's Shadow Form picture's taken\n\
+                📝 (📸 when hunting, camera's flash won't stop it)\n\
+                📝 🐌 it's not so fast\n\
                 "
             }
 
             Poltergeist => {
-                "
-                💪 (🤹 can throw/levitate many objects at once)
-                📝 noise from many moved objects can be a consequence
-                
-                😩 (🧹 becomes almost innefective in an empty room)
+                "\
+                💪 (🤹 can throw/levitate many objects at once)\n\
+                📝 noise from many moved objects can be a consequence\n\
+                \n\
+                😩 (🧹 becomes almost innefective in an empty room)\n\
                 "
             }
 
             Revenant => {
-                "
-                💪 ⏩ fastests ghost when hunting
-                💪 ⚔️ attacks regardless of sanity during hunt
-                
-                😩 🐌 slow otherwise, or when people are hiding
+                "\
+                💪 ⏩ fastests ghost when hunting\n\
+                💪 ⚔️ attacks regardless of sanity during hunt\n\
+                \n\
+                😩 🐌 slow otherwise, or when people are hiding\n\
                 "
             }
 
             Shade => {
-                "
-                💪 (⚔️ hunts more often on low sanity)
-                📝 prefers to target loners
-                📝 'being alone' means 'being alone in a room'
-                
-                😩 👪 won't hunt grouped people
-                📝 will hardly interact with grouped people
+                "\
+                💪 (⚔️ hunts more often on low sanity)\n\
+                📝 prefers to target loners\n\
+                📝 'being alone' means 'being alone in a room'\n\
+                \n\
+                😩 👪 won't hunt grouped people\n\
+                📝 will hardly interact with grouped people\n\
                 "
             }
 
             Spirit => {
-                "
-                💪 (none)
-                
-                😩 🚬 Smudge Sticks stop it's attacks for a long time
+                "\
+                💪 (none)\n\
+                \n\
+                😩 🚬 Smudge Sticks stop it's attacks for a long time\n\
                 "
             }
 
             Wraith => {
-                "
-                💪 🪁 can fly
-                💪 🪁 leaves no footsteps
-                📝 🧂 except it leaves a step mark on salt
-                💪 🧱 may move through walls
-                💪 🪑 may change the Ghost Room more frequently
-                
-                😩 🧂 stops attacking when in contact with salt
-                📝 🧂 but it becomes more agitated
+                "\
+                💪 🪁 can fly\n\
+                💪 🪁 leaves no footsteps\n\
+                📝 🧂 except it leaves a step mark on salt\n\
+                💪 🧱 may move through walls\n\
+                💪 🪑 may change the Ghost Room more frequently\n\
+                \n\
+                😩 🧂 stops attacking when in contact with salt\n\
+                📝 🧂 but it becomes more agitated\n\
                 "
             }
 
             Yurei => {
-                "
-                💪 😨 fastest sanity drainer
-                
-                😩 🚬 Smudge Sticks on it's room prevents it from wandering from it for a long time
+                "\
+                💪 😨 fastest sanity drainer\n\
+                \n\
+                😩 🚬 Smudge Sticks can affect it's room\n\
+                📝 prevents it from wandering for a long time\n\
                 "
             }
         }
@@ -601,7 +602,7 @@ impl Ghost {
         required_evidences: &[Evidence],
     ) -> Vec<Ghost> {
         ghosts
-            .filter(move |g| required_evidences.into_iter().all(|re| g.is_related(*re)))
+            .filter(move |g| required_evidences.iter().all(|re| g.is_related(*re)))
             .collect()
     }
 
@@ -610,11 +611,7 @@ impl Ghost {
         forbid_evidences: &[Evidence],
     ) -> Vec<Ghost> {
         ghosts
-            .filter(move |g| {
-                forbid_evidences
-                    .into_iter()
-                    .all(move |re| !g.is_related(*re))
-            })
+            .filter(move |g| forbid_evidences.iter().all(move |re| !g.is_related(*re)))
             .collect()
     }
 
