@@ -3,7 +3,7 @@
 [![App]][appurl] [![Ghosts]][ghostsurl]
 
 [ghosts]: https://img.shields.io/badge/ghosts-555555?style=for-the-badge&labelColor=555555&logoColor=white
-[ghostsurl]: https://swfsql.github.io/phasmo/doc/phasmo/enum.Ghost.html#variants
+[ghostsurl]: https://swfsql.github.io/phasmo/doc/phasmo_rs/phasmo/enum.Ghost.html#variants
 [app]: https://img.shields.io/badge/app-555555?style=for-the-badge&labelColor=555555&logoColor=white
 [appurl]: https://swfsql.github.io/phasmo/
 
