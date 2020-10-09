@@ -10,7 +10,7 @@
 Utility to help tracking evidences for the Phasmophobia game.
 
 Information mostly taken from [fandom/phasmophobia](https://phasmophobia.fandom.com/wiki/Phasmophobia_Wiki) (8/oct/2020).  
-Also inspired by other evidence trackers (see alternatives below).
+Also inspired by other evidence trackers (see alternatives at the end).
 
 ## Why is this
 
@@ -23,6 +23,14 @@ It should be easier to just open the app and click around, but otherwise you can
 
 The stuff you see are mostly emojis, as they are very terse ^^  
 For VR, I believe this app should work as a custom app from tools like OVRToolkit - but the clicking should be hard as it's not optimized for "touch-like" clicks.
+
+## Bugs
+
+- At the start, only a small screen area is shown (idk why). To workaround this, just resize the browser window (or zoom) back and forth.
+- Using a different zoom will make the mouse pointer calculation "change too much", and so it won't work. I also don't know why.
+
+Please note that the underlying drawing library is experimental and is not stable yet.  
+Also, note that this particular app is really non-optimal (resource-wise).
 
 ## Offline Testing
 

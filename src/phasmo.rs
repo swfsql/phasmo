@@ -31,44 +31,44 @@ pub enum Feature {
     Useful(UsefulFeature),
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum CautionFeature {
-    /// 🎯
-    SingleTarget,
     /// ️️⚔️
     Hostile,
-    /// ⏩
-    Fast,
-    /// 🐌
-    Slow,
     /// 🪁
     Flies,
     /// 🧱
     MoveThroughWalls,
+    /// ⏩
+    Fast,
+    /// 🎯
+    SingleTarget,
     /// 😨
     SanityDrain,
+    /// 🐌
+    Slow,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum UsefulFeature {
     /// ️✝️
     Crucifix,
-    /// 🔌
-    PowerSource,
-    /// 🕯️
-    Light,
-    /// 🙈
-    Hiding,
-    /// 📸
-    Picture,
-    /// 🧹
-    CleanRoom,
     /// 👪
     Grouped,
-    /// 🚬
-    SmudgeSticks,
     /// 🧂
     Salt,
+    /// 🚬
+    SmudgeSticks,
+    /// 🕯️
+    Light,
+    /// 📸
+    Picture,
+    /// 🔌
+    PowerSource,
+    /// 🧹
+    CleanRoom,
+    /// 🙈
+    Hiding,
 }
 
 // ps. the order is the same of the journal's ghost index

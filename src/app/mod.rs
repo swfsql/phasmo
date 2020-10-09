@@ -156,9 +156,15 @@ pub fn ui_builder() -> impl Widget<AppData> {
             use phasmo::Ghost;
             let ghosts = data.possible_ghosts();
 
-            let caution = Ghost::filter_by_caution_features(ghosts.iter().cloned());
+            let mut caution: Vec<_> = Ghost::filter_by_caution_features(ghosts.iter().cloned())
+                .into_iter()
+                .collect();
+            caution.sort_unstable();
 
-            let useful = Ghost::filter_by_useful_features(ghosts.iter().cloned());
+            let mut useful: Vec<_> = Ghost::filter_by_useful_features(ghosts.iter().cloned())
+                .into_iter()
+                .collect();
+            useful.sort_unstable();
 
             let caution_str: String = caution.iter().map(|c| c.to_string() + " ").collect();
             let useful_str: String = useful.iter().map(|u| u.to_string() + " ").collect();
@@ -225,6 +231,7 @@ pub fn ui_builder() -> impl Widget<AppData> {
                     e.status = EvidenceStatus::default();
                 }
             })
+            .padding((0., 2., 0., 0.))
             .lens(AppData::evidences);
 
         reset_flex.add_flex_child(reset_button, 1.0);
@@ -233,10 +240,18 @@ pub fn ui_builder() -> impl Widget<AppData> {
 
     // general ghost info
     {
-        let ghost_info =
-            Label::new(|g: &Wghost, _env: &_| format!("{} {:?}\n{}", g.0, g.0, g.0.description()))
-                .with_text_size(18.0)
-                .lens(AppData::selected);
+        let ghost_info = Label::new(|g: &Wghost, _env: &_| {
+            format!(
+                "{} {:?}\n\n🕵️ {}\n\n{}",
+                g.0,
+                g.0,
+                g.0.evidences().map(|e| e.to_string()).collect::<String>(),
+                g.0.description()
+            )
+        })
+        .with_text_size(18.0)
+        .padding((0., 13., 0., 0.))
+        .lens(AppData::selected);
 
         let mut ghost_flex = Flex::row();
         ghost_flex.add_flex_child(ghost_info, 1.0);
@@ -250,9 +265,10 @@ pub fn ui_builder() -> impl Widget<AppData> {
 pub fn run() {
     use druid::{AppLauncher, LocalizedString, WindowDesc};
 
-    let main_window = WindowDesc::new(ui_builder)
-        .title(LocalizedString::new("app-window-title").with_placeholder("Phasmo Evidence Tracker"))
-        .window_size((610.0, 420.0));
+    let main_window = WindowDesc::new(ui_builder).title(
+        LocalizedString::new("app-window-title").with_placeholder("Phasmo Evidence Tracker"),
+    );
+    // .with_min_size((610.0, 420.0));
 
     // Set our initial data
     let data = AppData::default();
