@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["kind","Lens for the field on #ty"],["status","Lens for the field on #ty"]]});

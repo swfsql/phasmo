@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["main",""],["print_all_features","Prints: Caution: 🐌🧱⚔️🎯😨⏩🪁 Useful: 👪🧂📸🚬🧹🔌✝️🙈🕯️"],["print_ghost_evidences","Prints:"],["print_ghost_features","Prints:"],["print_info","Demonstration on how to use some functions."]]});

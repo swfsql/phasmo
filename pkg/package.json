@@ -1,0 +1,15 @@
+{
+  "name": "phasmo-rs",
+  "collaborators": [
+    "Thi <swfsql@gmail.com.br>"
+  ],
+  "version": "0.0.1",
+  "files": [
+    "phasmo_rs_bg.wasm",
+    "phasmo_rs.js",
+    "phasmo_rs.d.ts"
+  ],
+  "module": "phasmo_rs.js",
+  "types": "phasmo_rs.d.ts",
+  "sideEffects": false
+}

@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["phasmo_rs"] = [{"text":"impl Eq for Evidence","synthetic":false,"types":[]},{"text":"impl Eq for Feature","synthetic":false,"types":[]},{"text":"impl Eq for CautionFeature","synthetic":false,"types":[]},{"text":"impl Eq for UsefulFeature","synthetic":false,"types":[]},{"text":"impl Eq for Ghost","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

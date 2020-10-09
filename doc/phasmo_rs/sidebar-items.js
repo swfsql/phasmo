@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["__wasm_bindgen_generated_wasm_main",""],["wasm_main",""]],"mod":[["app",""],["phasmo",""]]});
