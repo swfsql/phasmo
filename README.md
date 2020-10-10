@@ -27,7 +27,7 @@ For VR, I believe this app should work as a custom app from tools like OVRToolki
 ## Bugs
 
 - If your pc/phone browser doesn't support emoji, you are in bad luck.
-    - You can check [this page]() to verify.
+    - You can check [this page](https://swfsql.github.io/phasmo/doc/phasmo_rs/phasmo/enum.Ghost.html#variants) to verify.
     - Although apps like WhatsApp are able to show emojis, they use their own font so this doesn't mean that your browser will also be able to show them. (I didn't know that, and my own phone cant lol)
 - At the start, only a small portion of the screen is shown. Moving/resizing/zooming the window appears to fix this.
 - Zooming in/out mess up the cursor position. To mitigate this, I've added a small circle representing the "seen" cursor.
