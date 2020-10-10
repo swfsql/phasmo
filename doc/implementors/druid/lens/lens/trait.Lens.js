@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["phasmo_rs"] = [{"text":"impl Lens&lt;AppData, Vector&lt;EvidenceState&gt;&gt; for evidences","synthetic":false,"types":[]},{"text":"impl Lens&lt;AppData, Vector&lt;Wghost&gt;&gt; for ghosts","synthetic":false,"types":[]},{"text":"impl Lens&lt;AppData, Wghost&gt; for selected","synthetic":false,"types":[]},{"text":"impl Lens&lt;EvidenceState, EvidenceStatus&gt; for status","synthetic":false,"types":[]},{"text":"impl Lens&lt;EvidenceState, Evidence&gt; for kind","synthetic":false,"types":[]}];
+implementors["phasmo_rs"] = [{"text":"impl Lens&lt;AppData, Vector&lt;EvidenceStatus&gt;&gt; for evidence_status","synthetic":false,"types":[]},{"text":"impl Lens&lt;AppData, Wghost&gt; for selected","synthetic":false,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

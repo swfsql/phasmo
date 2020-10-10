@@ -116,8 +116,14 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">phasmo_rs</span>::<span class="ident">phasmo</span>::{<span class="ident">Evidence</span>, <span class="ident">Ghost</span>, <span class="ident">VariantIter</span>};
+<span class="kw">use</span> <span class="ident">phasmo_rs</span>::<span class="ident">phasmo</span>::{<span class="self">self</span>, <span class="ident">Evidence</span>, <span class="ident">Ghost</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashSet</span>;
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
@@ -141,7 +147,7 @@
     <span class="macro">println</span><span class="macro">!</span>();
     <span class="macro">println</span><span class="macro">!</span>();
 
-    <span class="kw">let</span> <span class="ident">all_ghosts</span> <span class="op">=</span> <span class="ident">Ghost</span>::<span class="ident">iter_variants</span>();
+    <span class="kw">let</span> <span class="ident">all_ghosts</span> <span class="op">=</span> <span class="ident">phasmo</span>::<span class="ident">GHOSTS</span>;
 
     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Requires Emf5:&quot;</span>);
     <span class="comment">// 🧞👹🥛😳🌬️🧟</span>
@@ -183,7 +189,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ie. for each ghost, it&#39;s evidences.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">print_ghost_evidences</span>() {
-    <span class="kw">for</span> <span class="ident">ghost</span> <span class="kw">in</span> <span class="ident">Ghost</span>::<span class="ident">iter_variants</span>() {
+    <span class="kw">for</span> <span class="ident">ghost</span> <span class="kw">in</span> <span class="ident">phasmo</span>::<span class="ident">GHOSTS</span>.<span class="ident">iter</span>() {
         <span class="kw">let</span> <span class="ident">evidences</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">ghost</span>.<span class="ident">evidences</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
         <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{:?}: {}&quot;</span>, <span class="ident">ghost</span>, <span class="ident">evidences</span>);
     }
@@ -207,8 +213,14 @@
 <span class="doccomment">/// ie. for each ghost, it&#39;s caution features</span>
 <span class="doccomment">/// followed by it&#39;s useful features.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">print_ghost_features</span>() {
-    <span class="kw">for</span> <span class="ident">ghost</span> <span class="kw">in</span> <span class="ident">Ghost</span>::<span class="ident">iter_variants</span>() {
-        <span class="kw">let</span> <span class="ident">feats</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">ghost</span>.<span class="ident">features</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
+    <span class="kw">use</span> <span class="ident">phasmo</span>::<span class="ident">Feature</span>::<span class="kw-2">*</span>;
+    <span class="kw">for</span> <span class="ident">ghost</span> <span class="kw">in</span> <span class="ident">phasmo</span>::<span class="ident">GHOSTS</span>.<span class="ident">iter</span>() {
+        <span class="kw">let</span> <span class="ident">feats</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">ghost</span>
+            .<span class="ident">caution_features</span>()
+            .<span class="ident">map</span>(<span class="ident">Caution</span>)
+            .<span class="ident">chain</span>(<span class="ident">ghost</span>.<span class="ident">useful_features</span>().<span class="ident">map</span>(<span class="ident">Useful</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_string</span>())
+            .<span class="ident">collect</span>();
         <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{:?}: {}&quot;</span>, <span class="ident">ghost</span>, <span class="ident">feats</span>);
     }
 }
@@ -220,7 +232,7 @@
 <span class="doccomment">/// ie. a union set of caution features applicable for each ghost,</span>
 <span class="doccomment">/// and a union set of useful feature applicable for each ghost.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">print_all_features</span>() {
-    <span class="kw">let</span> <span class="ident">all_ghosts</span> <span class="op">=</span> <span class="ident">Ghost</span>::<span class="ident">iter_variants</span>();
+    <span class="kw">let</span> <span class="ident">all_ghosts</span> <span class="op">=</span> <span class="ident">phasmo</span>::<span class="ident">GHOSTS</span>;
 
     <span class="macro">print</span><span class="macro">!</span>(<span class="string">&quot;Caution: &quot;</span>);
     <span class="kw">let</span> <span class="ident">caution</span> <span class="op">=</span> <span class="ident">Ghost</span>::<span class="ident">filter_by_caution_features</span>(<span class="ident">all_ghosts</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>());
@@ -229,7 +241,7 @@
     <span class="macro">println</span><span class="macro">!</span>();
 
     <span class="macro">print</span><span class="macro">!</span>(<span class="string">&quot;Useful: &quot;</span>);
-    <span class="kw">let</span> <span class="ident">useful</span> <span class="op">=</span> <span class="ident">Ghost</span>::<span class="ident">filter_by_useful_features</span>(<span class="ident">all_ghosts</span>.<span class="ident">into_iter</span>());
+    <span class="kw">let</span> <span class="ident">useful</span> <span class="op">=</span> <span class="ident">Ghost</span>::<span class="ident">filter_by_useful_features</span>(<span class="ident">all_ghosts</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>());
     <span class="ident">useful</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="macro">print</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">u</span>));
 }
 </pre></div>

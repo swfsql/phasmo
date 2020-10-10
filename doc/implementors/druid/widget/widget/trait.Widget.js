@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["phasmo_rs"] = [{"text":"impl&lt;C:&nbsp;Data, T:&nbsp;ListIter&lt;C&gt;&gt; Widget&lt;T&gt; for Hlist&lt;C&gt;","synthetic":false,"types":[]}];
+implementors["phasmo_rs"] = [{"text":"impl&lt;T:&nbsp;Data&gt; Widget&lt;T&gt; for Cursor","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;Data, B, F&gt; Widget&lt;T&gt; for Overlay&lt;B, F&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;B: Widget&lt;T&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;F: Widget&lt;T&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["evidences","Lens for the field on #ty"],["ghosts","Lens for the field on #ty"],["selected","Lens for the field on #ty"]]});
+initSidebarItems({"struct":[["evidence_status","Lens for the field on #ty"],["selected","Lens for the field on #ty"]]});

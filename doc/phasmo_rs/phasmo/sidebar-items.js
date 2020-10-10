@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["CautionFeature",""],["Evidence",""],["Feature",""],["Ghost",""],["UsefulFeature",""]],"trait":[["FilterBy",""],["VariantIter",""]]});
+initSidebarItems({"constant":[["CAUTION_FEATURES",""],["EVIDENCES",""],["GHOSTS",""],["USEFUL_FEATURES",""]],"enum":[["CautionFeature",""],["Evidence",""],["Feature",""],["Ghost",""],["UsefulFeature",""]],"trait":[["FilterBy",""]]});
