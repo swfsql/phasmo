@@ -1,9 +1,5 @@
 use std::collections::HashSet;
 
-pub trait VariantIter: Sized {
-    fn iter_variants() -> Vec<Self>;
-}
-
 pub trait FilterBy<T> {
     fn is_related(self, t: T) -> bool;
 }
@@ -312,80 +308,63 @@ impl std::fmt::Display for UsefulFeature {
     }
 }
 
-impl VariantIter for Evidence {
-    fn iter_variants() -> Vec<Self> {
-        use Evidence::*;
-        vec![
-            EmfLevel5,
-            SpiritBox,
-            Fingerprints,
-            GhostOrb,
-            GhostWriting,
-            FreezingTemperature,
-        ]
-    }
-}
+pub const EVIDENCES: [Evidence; 6] = {
+    use Evidence::*;
+    [
+        EmfLevel5,
+        SpiritBox,
+        Fingerprints,
+        GhostOrb,
+        GhostWriting,
+        FreezingTemperature,
+    ]
+};
 
-impl VariantIter for Ghost {
-    fn iter_variants() -> Vec<Self> {
-        use Ghost::*;
-        vec![
-            Spirit,
-            Wraith,
-            Phantom,
-            Poltergeist,
-            Banshee,
-            Jinn,
-            Mare,
-            Revenant,
-            Shade,
-            Demon,
-            Yurei,
-            Oni,
-        ]
-    }
-}
+pub const GHOSTS: [Ghost; 12] = {
+    use Ghost::*;
+    [
+        Spirit,
+        Wraith,
+        Phantom,
+        Poltergeist,
+        Banshee,
+        Jinn,
+        Mare,
+        Revenant,
+        Shade,
+        Demon,
+        Yurei,
+        Oni,
+    ]
+};
 
-impl VariantIter for Feature {
-    fn iter_variants() -> Vec<Self> {
-        use Feature::*;
-        let caution = CautionFeature::iter_variants().into_iter().map(Caution);
-        let useful = UsefulFeature::iter_variants().into_iter().map(Useful);
-        caution.chain(useful).collect()
-    }
-}
+pub const CAUTION_FEATURES: [CautionFeature; 7] = {
+    use CautionFeature::*;
+    [
+        Hostile,
+        Flies,
+        MoveThroughWalls,
+        Fast,
+        SingleTarget,
+        SanityDrain,
+        Slow,
+    ]
+};
 
-impl VariantIter for CautionFeature {
-    fn iter_variants() -> Vec<Self> {
-        use CautionFeature::*;
-        vec![
-            Hostile,
-            Flies,
-            MoveThroughWalls,
-            Fast,
-            SingleTarget,
-            SanityDrain,
-            Slow,
-        ]
-    }
-}
-
-impl VariantIter for UsefulFeature {
-    fn iter_variants() -> Vec<Self> {
-        use UsefulFeature::*;
-        vec![
-            Crucifix,
-            Grouped,
-            Salt,
-            SmudgeSticks,
-            Light,
-            Picture,
-            PowerSource,
-            CleanRoom,
-            Hiding,
-        ]
-    }
-}
+pub const USEFUL_FEATURES: [UsefulFeature; 9] = {
+    use UsefulFeature::*;
+    [
+        Crucifix,
+        Grouped,
+        Salt,
+        SmudgeSticks,
+        Light,
+        Picture,
+        PowerSource,
+        CleanRoom,
+        Hiding,
+    ]
+};
 
 impl Evidence {
     // ✔️
@@ -577,24 +556,27 @@ impl Ghost {
         }
     }
     pub fn evidences(self) -> impl Iterator<Item = Evidence> {
-        Evidence::iter_variants()
-            .into_iter()
-            .filter(move |e| self.is_related(*e))
-    }
-    pub fn features(self) -> impl Iterator<Item = Feature> {
-        Feature::iter_variants()
-            .into_iter()
+        EVIDENCES
+            .iter()
+            .cloned()
             .filter(move |e| self.is_related(*e))
     }
     pub fn caution_features(self) -> impl Iterator<Item = CautionFeature> {
-        CautionFeature::iter_variants()
-            .into_iter()
+        CAUTION_FEATURES
+            .iter()
+            .cloned()
             .filter(move |e| self.is_related(Feature::Caution(*e)))
     }
     pub fn useful_features(self) -> impl Iterator<Item = UsefulFeature> {
-        UsefulFeature::iter_variants()
-            .into_iter()
+        USEFUL_FEATURES
+            .iter()
+            .cloned()
             .filter(move |e| self.is_related(Feature::Useful(*e)))
+    }
+
+    pub fn is_valid(self, required_evidences: &[Evidence], forbid_evidences: &[Evidence]) -> bool {
+        required_evidences.iter().all(|re| self.is_related(*re))
+            && forbid_evidences.iter().all(move |re| !self.is_related(*re))
     }
 
     pub fn filter_by_required_evidences(

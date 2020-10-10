@@ -1,31 +1,44 @@
 #![allow(clippy::unnecessary_operation)]
 
-pub mod hlist;
+pub mod cursor;
+pub mod overlay;
 
 use crate::phasmo;
+use cursor::Cursor;
 use druid::{
     im::Vector,
     widget::{Button, Flex, Label},
     Data, Lens, Widget, WidgetExt,
 };
-use hlist::Hlist;
 
 #[derive(Debug, Clone, PartialEq, Data, Lens)]
 pub struct AppData {
-    evidences: Vector<EvidenceState>,
-    ghosts: Vector<Wghost>,
+    evidence_status: Vector<EvidenceStatus>,
     selected: Wghost,
+}
+
+struct Delegate {}
+
+const SELECT_GHOST: druid::Selector<phasmo::Ghost> = druid::Selector::new("select_ghost");
+
+impl druid::AppDelegate<AppData> for Delegate {
+    fn command(
+        &mut self,
+        _ctx: &mut druid::DelegateCtx,
+        _target: druid::Target,
+        cmd: &druid::Command,
+        data: &mut AppData,
+        _env: &druid::Env,
+    ) -> bool {
+        if let Some(ghost) = cmd.get(SELECT_GHOST) {
+            data.selected = Wghost(*ghost);
+        }
+        true
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Data)]
 pub struct Wghost(#[data(same_fn = "PartialEq::eq")] pub phasmo::Ghost);
-
-#[derive(Debug, Clone, PartialEq, Data, Lens)]
-pub struct EvidenceState {
-    status: EvidenceStatus,
-    #[data(same_fn = "PartialEq::eq")]
-    kind: phasmo::Evidence,
-}
 
 #[derive(Debug, Clone, PartialEq, Data)]
 #[repr(C)]
@@ -37,23 +50,14 @@ pub enum EvidenceStatus {
 
 impl Default for AppData {
     fn default() -> Self {
-        use phasmo::VariantIter;
-        let evidences: Vec<_> = phasmo::Evidence::iter_variants()
-            .into_iter()
-            .map(|e| EvidenceState {
-                status: EvidenceStatus::default(),
-                kind: e,
-            })
-            .collect();
-        let ghosts: Vector<_> = phasmo::Ghost::iter_variants()
-            .into_iter()
-            .map(Wghost)
+        let evidence_status: Vector<_> = phasmo::EVIDENCES
+            .iter()
+            .map(|_e| EvidenceStatus::default())
             .collect();
         #[allow(clippy::deref_addrof)]
-        let selected = ghosts[0].clone();
+        let selected = Wghost(phasmo::GHOSTS[0]);
         Self {
-            evidences: evidences.into(),
-            ghosts,
+            evidence_status,
             selected,
         }
     }
@@ -79,33 +83,33 @@ impl EvidenceStatus {
 impl AppData {
     fn possible_ghosts(&self) -> Vec<phasmo::Ghost> {
         use phasmo::Ghost;
-        let required: Vec<_> = self
-            .evidences
+        let required: Vec<_> = phasmo::EVIDENCES
             .iter()
-            .filter_map(|e| {
-                if let EvidenceStatus::Found = e.status {
-                    Some(e.kind)
+            .cloned()
+            .zip(self.evidence_status.iter())
+            .filter_map(|(evd, status)| {
+                if let EvidenceStatus::Found = status {
+                    Some(evd)
                 } else {
                     None
                 }
             })
             .collect();
-        let forbid: Vec<_> = self
-            .evidences
+        let forbid: Vec<_> = phasmo::EVIDENCES
             .iter()
-            .filter_map(|e| {
-                if let EvidenceStatus::Forbidden = e.status {
-                    Some(e.kind)
+            .cloned()
+            .zip(self.evidence_status.iter())
+            .filter_map(|(evd, status)| {
+                if let EvidenceStatus::Forbidden = status {
+                    Some(evd)
                 } else {
                     None
                 }
             })
             .collect();
 
-        let ghosts = Ghost::filter_by_required_evidences(
-            self.ghosts.iter().cloned().map(|g| g.0),
-            required.as_ref(),
-        );
+        let ghosts =
+            Ghost::filter_by_required_evidences(phasmo::GHOSTS.iter().cloned(), required.as_ref());
         Ghost::filter_by_forbid_evidences(ghosts.into_iter(), forbid.as_ref())
     }
 }
@@ -113,44 +117,39 @@ impl AppData {
 pub fn ui_builder() -> impl Widget<AppData> {
     let mut root = Flex::column();
 
-    let mut summary_flex = Flex::row();
     // let mut summary_ghosts_flex = Flex::row();
     let mut summary_features_flex = Flex::row();
 
     // summary
     {
-        // let ghost_icons = Flex::row()
-        let ghost_icon = || {
-            Button::new(|(g, _): &(Wghost, Option<Wghost>), _env: &_| g.0.to_string()).on_click(
-                |_ctx, (g, selected): &mut (Wghost, Option<Wghost>), _env| {
-                    *selected = Some(g.clone());
+        let mut ghost_icons = Flex::row();
+
+        for g in phasmo::GHOSTS.iter().cloned() {
+            let w = Button::new(move |evd_status: &Vector<EvidenceStatus>, _env: &_| {
+                let (required, forbid): (Vec<_>, Vec<_>) = phasmo::EVIDENCES
+                    .iter()
+                    .cloned()
+                    .zip(evd_status.iter())
+                    .filter(|(_evd, status)| !matches!(status, EvidenceStatus::Unknown))
+                    .partition(|(_evd, status)| matches!(status, EvidenceStatus::Found));
+                let required: Vec<_> = required.into_iter().map(|(evd, _status)| evd).collect();
+                let forbid: Vec<_> = forbid.into_iter().map(|(evd, _status)| evd).collect();
+                if g.is_valid(required.as_ref(), forbid.as_ref()) {
+                    g.to_string()
+                } else {
+                    String::new()
+                }
+            })
+            .on_click(
+                move |ctx: &mut druid::EventCtx, _e: &mut Vector<EvidenceStatus>, _env: &_| {
+                    ctx.submit_command(druid::Command::new(SELECT_GHOST, g), None);
                 },
             )
-        };
-
-        use druid::LensExt;
-        let ghost_icons = Hlist::new(move || {
-            Flex::column().with_child(ghost_icon())
-            // .with_flex_spacer(1.0)
-            // .padding(10.0)
-            // .background(Color::rgb(0.5, 0.0, 0.5))
-            // .fix_height(50.0)
-        })
-        .lens(druid::lens::Id.map(
-            |d: &AppData| {
-                d.possible_ghosts()
-                    .into_iter()
-                    .map(Wghost)
-                    .map(|g| (g, None))
-                    .collect::<Vector<_>>()
-            },
-            |d: &mut AppData, x: Vector<(Wghost, Option<Wghost>)>| {
-                if let Some(selected) = x.iter().filter_map(|(_, selected)| selected.clone()).next()
-                {
-                    d.selected = selected;
-                };
-            },
-        ));
+            .expand_width()
+            .lens(AppData::evidence_status);
+            ghost_icons.add_flex_child(w, 1.0);
+        }
+        root.add_flex_child(ghost_icons, 1.0);
 
         let feature_icons = Label::new(|data: &AppData, _env: &_| {
             use phasmo::Ghost;
@@ -172,17 +171,32 @@ pub fn ui_builder() -> impl Widget<AppData> {
             caution_str + "/" + &useful_str
         });
 
-        summary_flex.add_flex_child(ghost_icons, 1.0);
         summary_features_flex.add_flex_child(feature_icons, 1.0);
-        root.add_flex_child(summary_flex, 1.0);
         root.add_flex_child(summary_features_flex, 1.0);
     };
 
     // evidences
     {
+        // let evidence_status = || {
+        //     Label::new(|evidence: &EvidenceState, _env: &_| {
+        //         match evidence.status {
+        //             // ☐
+        //             // ❓ ➖ ❔
+        //             EvidenceStatus::Unknown => "➖",
+        //             // ☑
+        //             // ✔️
+        //             EvidenceStatus::Found => "✔️",
+        //             // ☒
+        //             // ❌
+        //             EvidenceStatus::Forbidden => "❌",
+        //         }
+        //         .to_string()
+        //     })
+        // };
+
         let evidence_status = || {
-            Label::new(|evidence: &EvidenceState, _env: &_| {
-                match evidence.status {
+            Label::new(|evidence: &EvidenceStatus, _env: &_| {
+                match evidence {
                     // ☐
                     // ❓ ➖ ❔
                     EvidenceStatus::Unknown => "➖",
@@ -197,6 +211,28 @@ pub fn ui_builder() -> impl Widget<AppData> {
             })
         };
 
+        let mut evidence_icons = Flex::row();
+        for (i, e) in phasmo::EVIDENCES.iter().cloned().enumerate() {
+            use druid::LensExt;
+            let l = (AppData::evidence_status).index(i);
+            let mut w = Flex::column();
+            let button = Button::new(move |_evd: &EvidenceStatus, _env: &_| e.to_string())
+                .on_click(
+                    move |_ctx: &mut druid::EventCtx, e: &mut EvidenceStatus, _env: &_| {
+                        e.next_status();
+                    },
+                )
+                .expand_width()
+                .lens(l);
+            let l = (AppData::evidence_status).index(i);
+            let status = evidence_status().lens(l);
+            w.add_flex_child(button, 1.0);
+            w.add_flex_child(status, 1.0);
+            evidence_icons.add_flex_child(w, 1.0);
+        }
+        root.add_flex_child(evidence_icons, 1.0);
+
+        /*
         let evidence_button = || {
             Button::new(|evidence: &EvidenceState, _env: &_| evidence.kind.to_string()).on_click(
                 |_ctx, e: &mut EvidenceState, _env| {
@@ -220,22 +256,23 @@ pub fn ui_builder() -> impl Widget<AppData> {
         evidences_flex_list.add_flex_child(evidences, 1.0);
 
         root.add_flex_child(evidences_flex_list, 1.0);
+        */
     }
 
     // reset button
     {
         let mut reset_flex = Flex::row();
         let reset_button = Button::new("🔄")
-            .on_click(|_ctx, evidences: &mut Vector<EvidenceState>, _env: _| {
+            .on_click(|_ctx, evidences: &mut Vector<EvidenceStatus>, _env: _| {
                 for e in evidences.iter_mut() {
-                    e.status = EvidenceStatus::default();
+                    *e = EvidenceStatus::default();
                 }
             })
-            .padding((0., 2., 0., 0.))
-            .lens(AppData::evidences);
+            .padding((0., 0., 0., 0.))
+            .lens(AppData::evidence_status);
 
         reset_flex.add_flex_child(reset_button, 1.0);
-        root.add_child(reset_flex);
+        root.add_flex_child(reset_flex, 1.0);
     }
 
     // general ghost info
@@ -250,7 +287,7 @@ pub fn ui_builder() -> impl Widget<AppData> {
             )
         })
         .with_text_size(18.0)
-        .padding((0., 13., 0., 0.))
+        .padding((0., 18., 0., 0.))
         .lens(AppData::selected);
 
         let mut ghost_flex = Flex::row();
@@ -259,7 +296,11 @@ pub fn ui_builder() -> impl Widget<AppData> {
         root.add_flex_child(ghost_flex, 1.0);
     }
 
-    root
+    // cursor overlay
+    {
+        let cursor = Cursor::default();
+        overlay::Overlay::new(root, cursor)
+    }
 }
 
 pub fn run() {
@@ -271,8 +312,10 @@ pub fn run() {
     // .with_min_size((610.0, 420.0));
 
     // Set our initial data
+    let delegate = Delegate {};
     let data = AppData::default();
     AppLauncher::with_window(main_window)
+        .delegate(delegate)
         // changes the default theme
         .configure_env(|env: &mut _, _t: &AppData| {
             use druid::{theme, Color};

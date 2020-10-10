@@ -1,4 +1,4 @@
-use phasmo_rs::phasmo::{Evidence, Ghost, VariantIter};
+use phasmo_rs::phasmo::{self, Evidence, Ghost};
 use std::collections::HashSet;
 
 fn main() {
@@ -22,7 +22,7 @@ pub fn print_info() {
     println!();
     println!();
 
-    let all_ghosts = Ghost::iter_variants();
+    let all_ghosts = phasmo::GHOSTS;
 
     println!("Requires Emf5:");
     // 🧞👹🥛😳🌬️🧟
@@ -64,7 +64,7 @@ pub fn print_info() {
 ///
 /// ie. for each ghost, it's evidences.
 pub fn print_ghost_evidences() {
-    for ghost in Ghost::iter_variants() {
+    for ghost in phasmo::GHOSTS.iter() {
         let evidences: String = ghost.evidences().map(|e| e.to_string()).collect();
         println!("{:?}: {}", ghost, evidences);
     }
@@ -88,8 +88,14 @@ pub fn print_ghost_evidences() {
 /// ie. for each ghost, it's caution features
 /// followed by it's useful features.
 pub fn print_ghost_features() {
-    for ghost in Ghost::iter_variants() {
-        let feats: String = ghost.features().map(|e| e.to_string()).collect();
+    use phasmo::Feature::*;
+    for ghost in phasmo::GHOSTS.iter() {
+        let feats: String = ghost
+            .caution_features()
+            .map(Caution)
+            .chain(ghost.useful_features().map(Useful))
+            .map(|e| e.to_string())
+            .collect();
         println!("{:?}: {}", ghost, feats);
     }
 }
@@ -101,7 +107,7 @@ pub fn print_ghost_features() {
 /// ie. a union set of caution features applicable for each ghost,
 /// and a union set of useful feature applicable for each ghost.
 pub fn print_all_features() {
-    let all_ghosts = Ghost::iter_variants();
+    let all_ghosts = phasmo::GHOSTS;
 
     print!("Caution: ");
     let caution = Ghost::filter_by_caution_features(all_ghosts.iter().cloned());
@@ -110,6 +116,6 @@ pub fn print_all_features() {
     println!();
 
     print!("Useful: ");
-    let useful = Ghost::filter_by_useful_features(all_ghosts.into_iter());
+    let useful = Ghost::filter_by_useful_features(all_ghosts.iter().cloned());
     useful.iter().for_each(|u| print!("{}", u));
 }
