@@ -25,5 +25,5 @@ version = "0.6.0"
 features = ["im"]
 rev = "9b70c3"
 git = "https://github.com/swfsql/druid"
-
 # path = "../druid/druid"
+

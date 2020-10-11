@@ -168,11 +168,11 @@ pub fn ui_builder() -> impl Widget<AppData> {
             let caution_str: String = caution.iter().map(|c| c.to_string() + " ").collect();
             let useful_str: String = useful.iter().map(|u| u.to_string() + " ").collect();
 
-            caution_str + "/" + &useful_str
+            caution_str + "/ " + &useful_str
         });
 
         summary_features_flex.add_flex_child(feature_icons, 1.0);
-        root.add_flex_child(summary_features_flex, 1.0);
+        root.add_flex_child(summary_features_flex.padding((0., 10., 0., 10.)), 1.0);
     };
 
     // evidences
@@ -301,7 +301,7 @@ pub fn ui_builder() -> impl Widget<AppData> {
     //     let cursor = Cursor::default();
     //     overlay::Overlay::new(root, cursor)
     // }
-    root
+    root.padding((20., 10.0, 20., 10.))
 }
 
 pub fn run() {

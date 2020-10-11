@@ -16,10 +16,10 @@ Also inspired by other evidence trackers (see alternatives at the end).
 
 It should be easier to just open the app and click around, but otherwise you can:
 
-- activate/forbid evidences
-- see possible ghost according to the evidence
-- see strenght and weakness features for those ghosts
-- check a ghost's description
+- Activate/forbid evidences.
+- See possible ghosts according to the evidence.
+- See strenght and weakness features for those ghosts.
+- Check a ghost's description.
 
 The stuff you see are mostly emojis, as they are very terse ^^  
 For VR, I believe this app should work as a custom app from tools like OVRToolkit - but the clicking should be hard as it's not optimized for "touch-like" clicks.
@@ -28,9 +28,8 @@ For VR, I believe this app should work as a custom app from tools like OVRToolki
 
 - If your pc/phone browser doesn't support emoji, you are in bad luck.
     - You can check [this page](https://swfsql.github.io/phasmo/doc/phasmo_rs/phasmo/enum.Ghost.html#variants) to verify.
-    - Although apps like WhatsApp are able to show emojis, they use their own font so this doesn't mean that your browser will also be able to show them. (I didn't know that, and my own phone cant lol)
-- At the start, only a small portion of the screen is shown. Moving/resizing/zooming the window appears to fix this.
-- Zooming in/out mess up the cursor position. To mitigate this, I've added a small circle representing the "seen" cursor.
+    - Although apps like WhatsApp are able to show emojis, they use their own font so this doesn't mean that your browser will also be able to show them. (I didn't know that, and my own phone can't lol)
+- Changing the zoom will mess up the cursor position. Try re-loading if that happens.
 
 Please note that the underlying drawing library is experimental and is not stable yet.  
 Also, note that this particular app is really non-optimal (resource-wise).
