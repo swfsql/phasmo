@@ -367,14 +367,15 @@
 <span id="364">364</span>
 <span id="365">365</span>
 <span id="366">366</span>
+<span id="367">367</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">unnecessary_operation</span>)]</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cursor</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">overlay</span>;
 
+<span class="comment">// use cursor::Cursor;</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">phasmo</span>;
-<span class="kw">use</span> <span class="ident">cursor</span>::<span class="ident">Cursor</span>;
 <span class="kw">use</span> <span class="ident">druid</span>::{
     <span class="ident">im</span>::<span class="ident">Vector</span>,
     <span class="ident">widget</span>::{<span class="ident">Button</span>, <span class="ident">Flex</span>, <span class="ident">Label</span>},
@@ -667,10 +668,11 @@
     }
 
     <span class="comment">// cursor overlay</span>
-    {
-        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor</span>::<span class="ident">default</span>();
-        <span class="ident">overlay</span>::<span class="ident">Overlay</span>::<span class="ident">new</span>(<span class="ident">root</span>, <span class="ident">cursor</span>)
-    }
+    <span class="comment">// {</span>
+    <span class="comment">//     let cursor = Cursor::default();</span>
+    <span class="comment">//     overlay::Overlay::new(root, cursor)</span>
+    <span class="comment">// }</span>
+    <span class="ident">root</span>
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>() {

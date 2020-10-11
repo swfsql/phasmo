@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Hlist","A list widget for a variable-size collection of items."]]});
