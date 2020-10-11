@@ -9,7 +9,7 @@
 
 Utility to help tracking evidences for the Phasmophobia game.
 
-Information mostly taken from [fandom/phasmophobia](https://phasmophobia.fandom.com/wiki/Phasmophobia_Wiki) (8/oct/2020).  
+Information mostly taken from [fandom/phasmophobia](https://phasmophobia.fandom.com/wiki/Phasmophobia_Wiki) (11/oct/2020).  
 Also inspired by other evidence trackers (see alternatives at the end).
 
 ## Why is this

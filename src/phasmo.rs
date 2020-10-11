@@ -72,7 +72,7 @@ pub enum UsefulFeature {
 pub enum Ghost {
     /// ## 👻
     ///
-    /// 🕵️ 🥶✨📖
+    /// 🕵️ 📻👣📖
     ///
     /// 💪 (none)  
     ///
@@ -390,7 +390,7 @@ impl FilterBy<Evidence> for Ghost {
         use Ghost::*;
         match (self, evidence) {
             (Banshee, EmfLevel5 | Fingerprints | FreezingTemperature) => true,
-            (Demon, FreezingTemperature | GhostWriting | SpiritBox) => true,
+            (Demon, SpiritBox | GhostWriting | FreezingTemperature) => true,
             (Jinn, SpiritBox | GhostOrb | EmfLevel5) => true,
             (Mare, SpiritBox | GhostOrb | FreezingTemperature) => true,
             (Oni, EmfLevel5 | SpiritBox | GhostWriting) => true,
@@ -398,7 +398,7 @@ impl FilterBy<Evidence> for Ghost {
             (Poltergeist, SpiritBox | Fingerprints | GhostOrb) => true,
             (Revenant, EmfLevel5 | Fingerprints | GhostWriting) => true,
             (Shade, EmfLevel5 | GhostOrb | GhostWriting) => true,
-            (Spirit, GhostOrb | GhostWriting | FreezingTemperature) => true,
+            (Spirit, SpiritBox | Fingerprints | GhostWriting) => true,
             (Wraith, Fingerprints | SpiritBox | FreezingTemperature) => true,
             (Yurei, GhostOrb | GhostWriting | FreezingTemperature) => true,
             _ => false,
