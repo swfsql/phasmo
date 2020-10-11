@@ -367,7 +367,6 @@
 <span id="364">364</span>
 <span id="365">365</span>
 <span id="366">366</span>
-<span id="367">367</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">unnecessary_operation</span>)]</span>
 
@@ -692,43 +691,42 @@
         .<span class="ident">configure_env</span>(<span class="op">|</span><span class="ident">env</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">_</span>, <span class="ident">_t</span>: <span class="kw-2">&amp;</span><span class="ident">AppData</span><span class="op">|</span> {
             <span class="kw">use</span> <span class="ident">druid</span>::{<span class="ident">theme</span>, <span class="ident">Color</span>};
 
+            <span class="comment">// tomorrow night-based theme</span>
+            <span class="kw">let</span> <span class="ident">dark_bg</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Color</span>::<span class="ident">from_rgba32_u32</span>(<span class="number">0x1D1F21FF</span>);
+            <span class="kw">let</span> <span class="ident">dark_bg2</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Color</span>::<span class="ident">from_rgba32_u32</span>(<span class="number">0x29211AFF</span>);
+            <span class="kw">let</span> <span class="ident">light_fg</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Color</span>::<span class="ident">from_rgba32_u32</span>(<span class="number">0xC5C8C6FF</span>);
+
+            <span class="comment">// solarized theme</span>
             <span class="comment">// let base03 = &amp;Color::from_rgba32_u32(0x002b36ff);</span>
-            <span class="kw">let</span> <span class="ident">base02</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Color</span>::<span class="ident">from_rgba32_u32</span>(<span class="number">0x073642ff</span>);
+            <span class="comment">// let base02 = &amp;Color::from_rgba32_u32(0x073642ff);</span>
             <span class="comment">// let base01 = &amp;Color::from_rgba32_u32(0x586e75ff);</span>
             <span class="comment">// let base00 = &amp;Color::from_rgba32_u32(0x657b83ff);</span>
-
             <span class="comment">// let base0 = &amp;Color::from_rgba32_u32(0x839496ff);</span>
-            <span class="kw">let</span> <span class="ident">base1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Color</span>::<span class="ident">from_rgba32_u32</span>(<span class="number">0x93a1a1ff</span>);
+            <span class="comment">// let base1 = &amp;Color::from_rgba32_u32(0x93a1a1ff);</span>
             <span class="comment">// let base2 = &amp;Color::from_rgba32_u32(0xeee8d5ff);</span>
             <span class="comment">// let base3 = &amp;Color::from_rgba32_u32(0xfdf6e3ff);</span>
-
             <span class="comment">// let yellow = &amp;Color::from_rgba32_u32(0xb58900ff);</span>
             <span class="comment">// let orange = &amp;Color::from_rgba32_u32(0xcb4b16ff);</span>
-            <span class="kw">let</span> <span class="ident">red</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Color</span>::<span class="ident">from_rgba32_u32</span>(<span class="number">0xdc322fff</span>);
+            <span class="comment">// let red = &amp;Color::from_rgba32_u32(0xdc322fff);</span>
             <span class="comment">// let magenta = &amp;Color::from_rgba32_u32(0xd33682ff);</span>
             <span class="comment">// let violet = &amp;Color::from_rgba32_u32(0x6c71c4ff);</span>
             <span class="comment">// let blue = &amp;Color::from_rgba32_u32(0x268bd2ff);</span>
             <span class="comment">// let cyan = &amp;Color::from_rgba32_u32(0x2aa198ff);</span>
             <span class="comment">// let green = &amp;Color::from_rgba32_u32(0x859900ff);</span>
 
-            <span class="ident">env</span>.<span class="ident">set</span>(<span class="ident">theme</span>::<span class="ident">LABEL_COLOR</span>, <span class="ident">base02</span>.<span class="ident">clone</span>());
+            <span class="ident">env</span>.<span class="ident">set</span>(<span class="ident">theme</span>::<span class="ident">LABEL_COLOR</span>, <span class="ident">light_fg</span>.<span class="ident">clone</span>());
 
             <span class="comment">// env.set(theme::PRIMARY_LIGHT, blue.clone());</span>
             <span class="comment">// env.set(theme::PRIMARY_DARK, yellow.clone());</span>
-
             <span class="comment">// env.set(theme::FOREGROUND_LIGHT, red.clone());</span>
             <span class="comment">// env.set(theme::FOREGROUND_DARK, green.clone());</span>
-
             <span class="comment">// env.set(theme::BACKGROUND_LIGHT, red.clone());</span>
             <span class="comment">// env.set(theme::BACKGROUND_DARK, green.clone());</span>
+            <span class="comment">// env.set(theme::SELECTION_COLOR, red.clone());</span>
 
-            <span class="ident">env</span>.<span class="ident">set</span>(<span class="ident">theme</span>::<span class="ident">SELECTION_COLOR</span>, <span class="ident">red</span>.<span class="ident">clone</span>());
-
-            <span class="ident">env</span>.<span class="ident">set</span>(<span class="ident">theme</span>::<span class="ident">BUTTON_LIGHT</span>, <span class="ident">base1</span>.<span class="ident">clone</span>());
-            <span class="ident">env</span>.<span class="ident">set</span>(<span class="ident">theme</span>::<span class="ident">BUTTON_DARK</span>, <span class="ident">base1</span>.<span class="ident">clone</span>());
-
-            <span class="ident">env</span>.<span class="ident">set</span>(<span class="ident">theme</span>::<span class="ident">WINDOW_BACKGROUND_COLOR</span>, <span class="ident">base1</span>.<span class="ident">clone</span>());
-
+            <span class="ident">env</span>.<span class="ident">set</span>(<span class="ident">theme</span>::<span class="ident">BUTTON_LIGHT</span>, <span class="ident">dark_bg2</span>.<span class="ident">clone</span>());
+            <span class="ident">env</span>.<span class="ident">set</span>(<span class="ident">theme</span>::<span class="ident">BUTTON_DARK</span>, <span class="ident">dark_bg</span>.<span class="ident">clone</span>());
+            <span class="ident">env</span>.<span class="ident">set</span>(<span class="ident">theme</span>::<span class="ident">WINDOW_BACKGROUND_COLOR</span>, <span class="ident">dark_bg</span>.<span class="ident">clone</span>());
             <span class="ident">env</span>.<span class="ident">set</span>(<span class="ident">theme</span>::<span class="ident">TEXT_SIZE_NORMAL</span>, <span class="number">22.0f64</span>);
             <span class="ident">env</span>.<span class="ident">set</span>(<span class="ident">theme</span>::<span class="ident">TEXT_SIZE_LARGE</span>, <span class="number">30.0f64</span>);
         })
