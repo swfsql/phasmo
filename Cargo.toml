@@ -15,7 +15,6 @@ path = "src/offline_bin.rs"
 
 [dependencies]
 console_error_panic_hook = "0.1.6"
-# kurbo = "0.6.2"
 
 [dependencies.wasm-bindgen]
 version = "0.2.65"
@@ -24,6 +23,7 @@ features = ["serde-serialize"]
 [dependencies.druid]
 version = "0.6.0"
 features = ["im"]
+rev = "9b70c3"
+git = "https://github.com/swfsql/druid"
 
-# [dependencies.druid-shell]
-# version = "0.6.0"
+# path = "../druid/druid"

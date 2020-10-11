@@ -3,8 +3,8 @@
 pub mod cursor;
 pub mod overlay;
 
+// use cursor::Cursor;
 use crate::phasmo;
-use cursor::Cursor;
 use druid::{
     im::Vector,
     widget::{Button, Flex, Label},
@@ -297,10 +297,11 @@ pub fn ui_builder() -> impl Widget<AppData> {
     }
 
     // cursor overlay
-    {
-        let cursor = Cursor::default();
-        overlay::Overlay::new(root, cursor)
-    }
+    // {
+    //     let cursor = Cursor::default();
+    //     overlay::Overlay::new(root, cursor)
+    // }
+    root
 }
 
 pub fn run() {

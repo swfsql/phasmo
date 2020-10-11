@@ -261,8 +261,7 @@ checksum = "212d0f5754cb6769937f4501cc0e67f4f4483c8d2c3e1e922ee9edbe4ab4c7c0"
 [[package]]
 name = "druid"
 version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f4b259ffca57f018990c2eac38b4b095811ae77b6387a1ce0a13a89e6eda4058"
+source = "git+https://github.com/swfsql/druid?rev=9b70c3#9b70c3397c953707b52de4608a6659ff897d6c6f"
 dependencies = [
  "console_log",
  "druid-derive",
@@ -283,8 +282,7 @@ dependencies = [
 [[package]]
 name = "druid-derive"
 version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4b53703b0938df4629bdd2c2b91cac35bb5a7a6ed6d18704099ff3c37beb9346"
+source = "git+https://github.com/swfsql/druid?rev=9b70c3#9b70c3397c953707b52de4608a6659ff897d6c6f"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -294,8 +292,7 @@ dependencies = [
 [[package]]
 name = "druid-shell"
 version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6da6ec49be2a815bd553c0af453043625841441c405a33e6e2d51c9a5acfe59b"
+source = "git+https://github.com/swfsql/druid?rev=9b70c3#9b70c3397c953707b52de4608a6659ff897d6c6f"
 dependencies = [
  "anyhow",
  "bitflags",
