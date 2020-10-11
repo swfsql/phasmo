@@ -321,43 +321,42 @@ pub fn run() {
         .configure_env(|env: &mut _, _t: &AppData| {
             use druid::{theme, Color};
 
+            // tomorrow night-based theme
+            let dark_bg = &Color::from_rgba32_u32(0x1D1F21FF);
+            let dark_bg2 = &Color::from_rgba32_u32(0x29211AFF);
+            let light_fg = &Color::from_rgba32_u32(0xC5C8C6FF);
+
+            // solarized theme
             // let base03 = &Color::from_rgba32_u32(0x002b36ff);
-            let base02 = &Color::from_rgba32_u32(0x073642ff);
+            // let base02 = &Color::from_rgba32_u32(0x073642ff);
             // let base01 = &Color::from_rgba32_u32(0x586e75ff);
             // let base00 = &Color::from_rgba32_u32(0x657b83ff);
-
             // let base0 = &Color::from_rgba32_u32(0x839496ff);
-            let base1 = &Color::from_rgba32_u32(0x93a1a1ff);
+            // let base1 = &Color::from_rgba32_u32(0x93a1a1ff);
             // let base2 = &Color::from_rgba32_u32(0xeee8d5ff);
             // let base3 = &Color::from_rgba32_u32(0xfdf6e3ff);
-
             // let yellow = &Color::from_rgba32_u32(0xb58900ff);
             // let orange = &Color::from_rgba32_u32(0xcb4b16ff);
-            let red = &Color::from_rgba32_u32(0xdc322fff);
+            // let red = &Color::from_rgba32_u32(0xdc322fff);
             // let magenta = &Color::from_rgba32_u32(0xd33682ff);
             // let violet = &Color::from_rgba32_u32(0x6c71c4ff);
             // let blue = &Color::from_rgba32_u32(0x268bd2ff);
             // let cyan = &Color::from_rgba32_u32(0x2aa198ff);
             // let green = &Color::from_rgba32_u32(0x859900ff);
 
-            env.set(theme::LABEL_COLOR, base02.clone());
+            env.set(theme::LABEL_COLOR, light_fg.clone());
 
             // env.set(theme::PRIMARY_LIGHT, blue.clone());
             // env.set(theme::PRIMARY_DARK, yellow.clone());
-
             // env.set(theme::FOREGROUND_LIGHT, red.clone());
             // env.set(theme::FOREGROUND_DARK, green.clone());
-
             // env.set(theme::BACKGROUND_LIGHT, red.clone());
             // env.set(theme::BACKGROUND_DARK, green.clone());
+            // env.set(theme::SELECTION_COLOR, red.clone());
 
-            env.set(theme::SELECTION_COLOR, red.clone());
-
-            env.set(theme::BUTTON_LIGHT, base1.clone());
-            env.set(theme::BUTTON_DARK, base1.clone());
-
-            env.set(theme::WINDOW_BACKGROUND_COLOR, base1.clone());
-
+            env.set(theme::BUTTON_LIGHT, dark_bg2.clone());
+            env.set(theme::BUTTON_DARK, dark_bg.clone());
+            env.set(theme::WINDOW_BACKGROUND_COLOR, dark_bg.clone());
             env.set(theme::TEXT_SIZE_NORMAL, 22.0f64);
             env.set(theme::TEXT_SIZE_LARGE, 30.0f64);
         })
